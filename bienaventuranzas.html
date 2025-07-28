@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Interactivo de las Bienaventuranzas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is structured as a single-page vertical scrolling experience. A fixed navigation bar at the top allows users to jump to specific sections. The main content is divided into an introduction followed by a series of interactive "cards," one for each Beatitude. Initially, each card displays only the Beatitude's text. Upon clicking, the card expands to reveal a detailed explanation and a reflection question. This structure was chosen to encourage focused engagement, prevent information overload, and allow for self-paced, personal reflection, which is more effective for this type of spiritual content than a linear presentation. -->
+    <!-- Visualization & Content Choices: Report Info: Each Beatitude with its explanation and reflection. -> Goal: Inform & Encourage Personal Reflection. -> Viz/Presentation Method: Interactive HTML/CSS cards. -> Interaction: Click-to-reveal details. This method turns passive reading into an active exploration. -> Justification: This approach is ideal for textual and reflective content, making it more digestible and engaging than static text blocks. It allows users to control the flow of information. -> Library/Method: Vanilla JavaScript for interactions, Tailwind CSS for styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDF8F2; /* Warm white */
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D97706; /* Amber 600 */
+            border-bottom-color: #D97706;
+        }
+        .beatitude-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #E5E7EB;
+        }
+        .beatitude-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            border-color: #FBBF24; /* Amber 400 */
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
+        }
+        .details.open {
+            max-height: 500px; /* Adjust as needed */
+        }
+        .icon-style {
+            font-size: 2rem;
+            color: #FBBF24; /* Amber 400 */
+            line-height: 1;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-amber-700">Las Bienaventuranzas</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div id="nav-menu" class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduccion" class="nav-link px-3 py-2 text-sm font-medium border-b-2 border-transparent">Introducción</a>
+                        <a href="#explorador" class="nav-link px-3 py-2 text-sm font-medium border-b-2 border-transparent">Explorador</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-amber-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#introduccion" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Introducción</a>
+                <a href="#explorador" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Explorador</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="introduccion" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-base font-semibold text-amber-600 tracking-wide uppercase">El Camino a la Verdadera Felicidad</h2>
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Un Viaje al Corazón del Evangelio</p>
+                <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-500">
+                    Las Bienaventuranzas, proclamadas por Jesús en el Sermón de la Montaña, no son un conjunto de reglas, sino un mapa hacia la plenitud y la felicidad auténtica. Nos invitan a adoptar un nuevo estilo de vida, una nueva mentalidad, que contrasta con los valores del mundo. Esta aplicación interactiva te guiará a través de cada una de ellas, ofreciendo un espacio para la comprensión y la reflexión personal.
+                </p>
+            </div>
+        </section>
+
+        <section id="explorador" class="py-16 sm:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Explora las Bienaventuranzas</h2>
+                     <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-500">Haz clic en cada tarjeta para revelar su significado profundo y una pregunta para tu meditación.</p>
+                </div>
+                <div id="beatitudes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </div>
+        </section>
+        
+        <section class="bg-white py-16">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Un Llamado a la Transformación</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+                    Las Bienaventuranzas son el retrato de Jesús y el camino que nos propone. Son una invitación personal y constante a la transformación. Al reflexionar sobre ellas, nos fortalecemos como individuos y como comunidad de servicio.
+                </p>
+                <div class="mt-8">
+                    <p class="text-lg font-medium text-amber-700">¿Qué Bienaventuranza resuena más en ti hoy? Te invitamos a elegir una para vivirla y practicarla más profundamente esta semana.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 Explorador de las Bienaventuranzas. Creado para la reflexión y el crecimiento espiritual.</p>
+            <p class="text-sm text-gray-400 mt-2">Una herramienta para el Equipo de Servidores(as) de Emaús.</p>
+        </div>
+    </footer>
+
+    <script>
+        const beatitudesData = [
+            {
+                icon: '🤲',
+                title: "Bienaventurados los pobres de espíritu,",
+                subtitle: "porque de ellos es el Reino de los Cielos.",
+                explanation: "No se refiere solo a la carencia material, sino a la humildad, el desapego y la total dependencia de Dios. Es reconocer que todo don y gracia provienen de Él, vaciándonos de nuestro ego para ser llenados por su presencia.",
+                reflection: "¿En qué o en quién confío más: en mis propias fuerzas y posesiones, o en la providencia y el amor de Dios?"
+            },
+            {
+                icon: '🌿',
+                title: "Bienaventurados los mansos,",
+                subtitle: "porque ellos heredarán la tierra.",
+                explanation: "La mansedumbre no es debilidad, sino fortaleza controlada, paciencia y autocontrol. Es la capacidad de no devolver mal por mal, de responder con amor y serenidad ante las provocaciones, reflejando la paciencia de Cristo.",
+                reflection: "¿Cómo reacciono ante las provocaciones o las injusticias? ¿Soy paciente y sereno con los demás, buscando la paz?"
+            },
+            {
+                icon: '💧',
+                title: "Bienaventurados los que lloran,",
+                subtitle: "porque ellos serán consolados.",
+                explanation: "Este llanto surge de la compasión por el sufrimiento del mundo, por el pecado y la injusticia. Es la capacidad de empatizar con el dolor ajeno y de anhelar la redención y el consuelo que solo Dios puede dar.",
+                reflection: "¿Me duele lo que le duele a Dios? ¿Soy sensible al sufrimiento de los demás y busco ser un instrumento de su consuelo?"
+            },
+            {
+                icon: '⚖️',
+                title: "Bienaventurados los que tienen hambre y sed de justicia,",
+                subtitle: "porque ellos serán saciados.",
+                explanation: "Es un deseo ardiente por la rectitud, la santidad y el cumplimiento de la voluntad de Dios. Anhela un mundo donde reinen la verdad, la equidad y el amor de Dios, y trabaja activamente por ello.",
+                reflection: "¿Qué tan fuerte es mi deseo de ser justo ante Dios y los hombres? ¿Lucho por la verdad y la equidad en mi entorno?"
+            },
+            {
+                icon: '🤝',
+                title: "Bienaventurados los misericordiosos,",
+                subtitle: "porque ellos alcanzarán misericordia.",
+                explanation: "Ser misericordioso es imitar el corazón de Dios: perdonar sin límites, compadecerse del que sufre y ayudar activamente al necesitado. Es ver a Cristo en el prójimo y actuar en consecuencia, con un amor que no juzga.",
+                reflection: "¿Soy rápido para perdonar a quienes me ofenden? ¿Practico las obras de misericordia con mi prójimo de manera concreta?"
+            },
+            {
+                icon: '💖',
+                title: "Bienaventurados los limpios de corazón,",
+                subtitle: "porque ellos verán a Dios.",
+                explanation: "La limpieza de corazón es la pureza de intenciones, la sinceridad y la transparencia. Es tener un corazón indiviso, totalmente orientado hacia Dios, buscando su gloria en cada pensamiento, palabra y acción.",
+                reflection: "¿Cuáles son las verdaderas intenciones detrás de mis acciones? ¿Busco agradar a Dios o busco el reconocimiento de los hombres?"
+            },
+            {
+                icon: '🕊️',
+                title: "Bienaventurados los que buscan la paz,",
+                subtitle: "porque ellos serán llamados Hijos de Dios.",
+                explanation: "No es solo la ausencia de conflicto, sino ser constructores activos de paz y reconciliación en todos los ámbitos de la vida. Es llevar la paz de Cristo a un mundo roto, sanando heridas y uniendo corazones.",
+                reflection: "¿Soy un generador de paz o de conflicto en mis relaciones? ¿Busco activamente la reconciliación y el entendimiento?"
+            },
+            {
+                icon: '🛡️',
+                title: "Bienaventurados los perseguidos por causa de la justicia,",
+                subtitle: "porque de ellos es el Reino de los Cielos.",
+                explanation: "Esta bienaventuranza se refiere a aquellos que sufren oposición, críticas o rechazo por vivir fielmente su fe y defender la verdad del Evangelio. Es el costo del discipulado, una señal de contradicción en un mundo que no siempre acepta a Cristo.",
+                reflection: "¿Estoy dispuesto a enfrentar la crítica o el rechazo por mi fe? ¿Encuentro mi alegría en ser identificado con Cristo, incluso en la adversidad?"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('beatitudes-container');
+            beatitudesData.forEach((data, index) => {
+                const card = document.createElement('div');
+                card.className = 'beatitude-card bg-white rounded-lg shadow-md cursor-pointer overflow-hidden';
+                card.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="icon-style mr-4">${data.icon}</div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">${data.title}</h3>
+                                <p class="text-md text-gray-600">${data.subtitle}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="details bg-amber-50/50">
+                        <div class="p-6 border-t border-amber-200">
+                            <h4 class="font-bold text-amber-800 mb-2">Explicación</h4>
+                            <p class="text-gray-700 text-sm mb-4">${data.explanation}</p>
+                            <h4 class="font-bold text-amber-800 mb-2">Reflexión</h4>
+                            <p class="text-gray-700 text-sm italic">"${data.reflection}"</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                card.addEventListener('click', () => {
+                    card.querySelector('.details').classList.toggle('open');
+                });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                         mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('section[id]');
+            const navMenuLinks = document.querySelectorAll('#nav-menu a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navMenuLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
